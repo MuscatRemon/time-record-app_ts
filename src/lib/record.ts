@@ -31,3 +31,31 @@ export const insertRecord = async (
     console.log(`登録しました`);
   }
 };
+
+export const updateRecord = async (
+  recordId: number,
+  inputTitle: string,
+  inputTime: number | ""
+) => {
+  const { status } = await supabase
+    .from(tableName)
+    .upsert({ id: recordId, title: inputTitle, time: inputTime })
+    .select();
+
+  if (status === 201) {
+    console.log("編集しました");
+  }
+};
+
+export const deleteRecord = async (recordId: number) => {
+  if (!confirm("本当に削除しますか？")) {
+    console.log("キャンセルしました");
+    return;
+  }
+
+  const response = await supabase.from(tableName).delete().eq("id", recordId);
+
+  if (response.status === 204) {
+    console.log("削除しました");
+  }
+};
