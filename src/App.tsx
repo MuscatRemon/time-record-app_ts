@@ -23,6 +23,7 @@ import {
 } from "./lib/record";
 import { useEffect, useState } from "react";
 import type { Record } from "./domain/record";
+import { PrimaryButton } from "./components/atoms/PrimaryButton";
 
 function App() {
   console.log("Appレンダリング");
@@ -141,9 +142,7 @@ function App() {
               <Box textAlign={"right"}>
                 <Dialog.Root>
                   <Dialog.Trigger asChild>
-                    <Button w={140} bg={"blue.600"}>
-                      新規登録
-                    </Button>
+                    <PrimaryButton w={140}>新規登録</PrimaryButton>
                   </Dialog.Trigger>
                   <Portal>
                     <Dialog.Backdrop />
@@ -179,9 +178,9 @@ function App() {
                           </Stack>
                         </Dialog.Body>
                         <Dialog.Footer justifyContent={"left"}>
-                          <Button bg={"blue.600"} onClick={onClickRegistration}>
+                          <PrimaryButton onClick={onClickRegistration}>
                             登録
-                          </Button>
+                          </PrimaryButton>
                         </Dialog.Footer>
                         <Dialog.CloseTrigger asChild>
                           <CloseButton size="sm" />
@@ -269,9 +268,9 @@ function App() {
                             </Stack>
                           </Dialog.Body>
                           <Dialog.Footer justifyContent={"left"}>
-                            <Button bg={"blue.600"} onClick={onClickEditRecord}>
-                              登録
-                            </Button>
+                            <PrimaryButton onClick={onClickEditRecord}>
+                              編集
+                            </PrimaryButton>
                           </Dialog.Footer>
                           <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
