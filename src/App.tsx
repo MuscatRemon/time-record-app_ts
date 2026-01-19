@@ -10,6 +10,7 @@ import {
   IconButton,
   Input,
   Portal,
+  Spinner,
   Stack,
   Table,
 } from "@chakra-ui/react";
@@ -32,11 +33,15 @@ function App() {
   const [inputEditTitle, setInputEditTitle] = useState<string>("");
   const [inputEditTime, setInputEditTime] = useState<number | "">("");
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isMainLoading, setIsMainLoading] = useState(false);
 
   useEffect(() => {
+    setIsMainLoading(true);
+
     const getAllRecords = async () => {
       const recordsData = await GetAllRecords();
       setRecords(recordsData);
+      setIsMainLoading(false);
     };
 
     getAllRecords();
@@ -127,150 +132,158 @@ function App() {
               学習記録アプリ-TS
             </Heading>
           </Center>
-          <Box textAlign={"right"}>
-            <Dialog.Root>
-              <Dialog.Trigger asChild>
-                <Button w={140} bg={"blue.600"}>
-                  新規登録
-                </Button>
-              </Dialog.Trigger>
-              <Portal>
-                <Dialog.Backdrop />
-                <Dialog.Positioner>
-                  <Dialog.Content>
-                    <Dialog.Header>
-                      <Dialog.Title>新規登録</Dialog.Title>
-                    </Dialog.Header>
-                    <Dialog.Body>
-                      <Stack gap="4" align="flex-start" maxW="sm">
-                        <Field.Root>
-                          <Field.Label>学習内容</Field.Label>
-                          <Input
-                            placeholder="reactの学習"
-                            variant="outline"
-                            size="sm"
-                            value={inputTitle}
-                            onChange={onChangeTitle}
-                          />
-                        </Field.Root>
-                        <Field.Root>
-                          <Field.Label>学習時間</Field.Label>
-                          <Input
-                            placeholder="0"
-                            variant="outline"
-                            size="sm"
-                            type="number"
-                            min="0"
-                            value={inputTime}
-                            onChange={onChangeTime}
-                          />
-                        </Field.Root>
-                      </Stack>
-                    </Dialog.Body>
-                    <Dialog.Footer justifyContent={"left"}>
-                      <Button bg={"blue.600"} onClick={onClickRegistration}>
-                        登録
-                      </Button>
-                    </Dialog.Footer>
-                    <Dialog.CloseTrigger asChild>
-                      <CloseButton size="sm" />
-                    </Dialog.CloseTrigger>
-                  </Dialog.Content>
-                </Dialog.Positioner>
-              </Portal>
-            </Dialog.Root>
-          </Box>
-          <Table.Root tableLayout={"fixed"} w={"100%"}>
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader>学習内容</Table.ColumnHeader>
-                <Table.ColumnHeader>学習時間</Table.ColumnHeader>
-                <Table.ColumnHeader w={"10%"}></Table.ColumnHeader>
-                <Table.ColumnHeader w={"10%"}></Table.ColumnHeader>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {records.map((record) => {
-                return (
-                  <Table.Row key={record.id}>
-                    <Table.Cell>{record.title}</Table.Cell>
-                    <Table.Cell>{record.time}</Table.Cell>
-                    <Table.Cell textAlign={"center"}>
-                      <IconButton
-                        variant={"ghost"}
-                        onClick={() =>
-                          onClickEditButton(
-                            record.id,
-                            record.title,
-                            record.time
-                          )
-                        }
-                      >
-                        <Pencil color="green" />
-                      </IconButton>
-                    </Table.Cell>
-                    <Table.Cell textAlign={"center"}>
-                      <IconButton
-                        variant={"ghost"}
-                        onClick={() => onClickDeleteRecord(record.id)}
-                      >
-                        <Trash color="red" />
-                      </IconButton>
-                    </Table.Cell>
+          {isMainLoading ? (
+            <Center>
+              <Spinner size="lg" />
+            </Center>
+          ) : (
+            <>
+              <Box textAlign={"right"}>
+                <Dialog.Root>
+                  <Dialog.Trigger asChild>
+                    <Button w={140} bg={"blue.600"}>
+                      新規登録
+                    </Button>
+                  </Dialog.Trigger>
+                  <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                      <Dialog.Content>
+                        <Dialog.Header>
+                          <Dialog.Title>新規登録</Dialog.Title>
+                        </Dialog.Header>
+                        <Dialog.Body>
+                          <Stack gap="4" align="flex-start" maxW="sm">
+                            <Field.Root>
+                              <Field.Label>学習内容</Field.Label>
+                              <Input
+                                placeholder="reactの学習"
+                                variant="outline"
+                                size="sm"
+                                value={inputTitle}
+                                onChange={onChangeTitle}
+                              />
+                            </Field.Root>
+                            <Field.Root>
+                              <Field.Label>学習時間</Field.Label>
+                              <Input
+                                placeholder="0"
+                                variant="outline"
+                                size="sm"
+                                type="number"
+                                min="0"
+                                value={inputTime}
+                                onChange={onChangeTime}
+                              />
+                            </Field.Root>
+                          </Stack>
+                        </Dialog.Body>
+                        <Dialog.Footer justifyContent={"left"}>
+                          <Button bg={"blue.600"} onClick={onClickRegistration}>
+                            登録
+                          </Button>
+                        </Dialog.Footer>
+                        <Dialog.CloseTrigger asChild>
+                          <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
+                      </Dialog.Content>
+                    </Dialog.Positioner>
+                  </Portal>
+                </Dialog.Root>
+              </Box>
+              <Table.Root tableLayout={"fixed"} w={"100%"}>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeader>学習内容</Table.ColumnHeader>
+                    <Table.ColumnHeader>学習時間</Table.ColumnHeader>
+                    <Table.ColumnHeader w={"10%"}></Table.ColumnHeader>
+                    <Table.ColumnHeader w={"10%"}></Table.ColumnHeader>
                   </Table.Row>
-                );
-              })}
-              <Dialog.Root
-                open={isEditOpen}
-                onOpenChange={(e) => setIsEditOpen(e.open)}
-              >
-                <Portal>
-                  <Dialog.Backdrop />
-                  <Dialog.Positioner>
-                    <Dialog.Content>
-                      <Dialog.Header>
-                        <Dialog.Title>編集</Dialog.Title>
-                      </Dialog.Header>
-                      <Dialog.Body>
-                        <Stack gap="4" align="flex-start" maxW="sm">
-                          <Field.Root>
-                            <Field.Label>学習内容</Field.Label>
-                            <Input
-                              placeholder="reactの学習"
-                              variant="outline"
-                              size="sm"
-                              value={inputEditTitle}
-                              onChange={onChangeEditTitle}
-                            />
-                          </Field.Root>
-                          <Field.Root>
-                            <Field.Label>学習時間</Field.Label>
-                            <Input
-                              placeholder="0"
-                              variant="outline"
-                              size="sm"
-                              type="number"
-                              min="0"
-                              value={inputEditTime}
-                              onChange={onChangeEditTime}
-                            />
-                          </Field.Root>
-                        </Stack>
-                      </Dialog.Body>
-                      <Dialog.Footer justifyContent={"left"}>
-                        <Button bg={"blue.600"} onClick={onClickEditRecord}>
-                          登録
-                        </Button>
-                      </Dialog.Footer>
-                      <Dialog.CloseTrigger asChild>
-                        <CloseButton size="sm" />
-                      </Dialog.CloseTrigger>
-                    </Dialog.Content>
-                  </Dialog.Positioner>
-                </Portal>
-              </Dialog.Root>
-            </Table.Body>
-          </Table.Root>
+                </Table.Header>
+                <Table.Body>
+                  {records.map((record) => {
+                    return (
+                      <Table.Row key={record.id}>
+                        <Table.Cell>{record.title}</Table.Cell>
+                        <Table.Cell>{record.time}</Table.Cell>
+                        <Table.Cell textAlign={"center"}>
+                          <IconButton
+                            variant={"ghost"}
+                            onClick={() =>
+                              onClickEditButton(
+                                record.id,
+                                record.title,
+                                record.time
+                              )
+                            }
+                          >
+                            <Pencil color="green" />
+                          </IconButton>
+                        </Table.Cell>
+                        <Table.Cell textAlign={"center"}>
+                          <IconButton
+                            variant={"ghost"}
+                            onClick={() => onClickDeleteRecord(record.id)}
+                          >
+                            <Trash color="red" />
+                          </IconButton>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })}
+                  <Dialog.Root
+                    open={isEditOpen}
+                    onOpenChange={(e) => setIsEditOpen(e.open)}
+                  >
+                    <Portal>
+                      <Dialog.Backdrop />
+                      <Dialog.Positioner>
+                        <Dialog.Content>
+                          <Dialog.Header>
+                            <Dialog.Title>編集</Dialog.Title>
+                          </Dialog.Header>
+                          <Dialog.Body>
+                            <Stack gap="4" align="flex-start" maxW="sm">
+                              <Field.Root>
+                                <Field.Label>学習内容</Field.Label>
+                                <Input
+                                  placeholder="reactの学習"
+                                  variant="outline"
+                                  size="sm"
+                                  value={inputEditTitle}
+                                  onChange={onChangeEditTitle}
+                                />
+                              </Field.Root>
+                              <Field.Root>
+                                <Field.Label>学習時間</Field.Label>
+                                <Input
+                                  placeholder="0"
+                                  variant="outline"
+                                  size="sm"
+                                  type="number"
+                                  min="0"
+                                  value={inputEditTime}
+                                  onChange={onChangeEditTime}
+                                />
+                              </Field.Root>
+                            </Stack>
+                          </Dialog.Body>
+                          <Dialog.Footer justifyContent={"left"}>
+                            <Button bg={"blue.600"} onClick={onClickEditRecord}>
+                              登録
+                            </Button>
+                          </Dialog.Footer>
+                          <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                          </Dialog.CloseTrigger>
+                        </Dialog.Content>
+                      </Dialog.Positioner>
+                    </Portal>
+                  </Dialog.Root>
+                </Table.Body>
+              </Table.Root>
+            </>
+          )}
         </Stack>
       </Container>
     </>
