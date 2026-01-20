@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Center,
   CloseButton,
   Container,
@@ -15,26 +14,20 @@ import {
   Table,
 } from "@chakra-ui/react";
 import { Pencil, Trash } from "lucide-react";
-import {
-  deleteRecord,
-  GetAllRecords,
-  insertRecord,
-  updateRecord,
-} from "./lib/record";
+import { deleteRecord, GetAllRecords, insertRecord } from "./lib/record";
 import { useEffect, useState } from "react";
 import type { Record } from "./domain/record";
 import { PrimaryButton } from "./components/atoms/PrimaryButton";
+import { RecordEditDialog } from "./components/organisms/RecordEditDialog";
 
 function App() {
   console.log("Appレンダリング");
   const [records, setRecords] = useState<Record[]>([]);
   const [inputTitle, setInputTitle] = useState<string>("");
   const [inputTime, setInputTime] = useState<number | "">("");
-  const [editRecordId, setEditRecordId] = useState<number>(0);
-  const [inputEditTitle, setInputEditTitle] = useState<string>("");
-  const [inputEditTime, setInputEditTime] = useState<number | "">("");
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isMainLoading, setIsMainLoading] = useState(false);
+
+  const [editRecord, setEditRecord] = useState<Record | null>();
 
   useEffect(() => {
     setIsMainLoading(true);
@@ -63,21 +56,6 @@ function App() {
     }
   };
 
-  const onChangeEditTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputEditTitle(e.target.value);
-  };
-
-  const onChangeEditTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const num = Number(value);
-
-    if (num < 0) {
-      setInputEditTime(0);
-    } else {
-      setInputEditTime(num);
-    }
-  };
-
   const onClickRegistration = async () => {
     if (!inputTitle || !inputTime) {
       // setIsAlert(true);
@@ -90,28 +68,6 @@ function App() {
     setInputTitle("");
     setInputTime("");
     // setIsAlert(false);
-  };
-
-  const onClickEditButton = (
-    recordId: number,
-    recordTitle: string,
-    recordTime: number | ""
-  ) => {
-    setEditRecordId(recordId);
-    setInputEditTitle(recordTitle);
-    setInputEditTime(recordTime);
-    setIsEditOpen(true);
-  };
-
-  const onClickEditRecord = async () => {
-    if (!inputEditTitle || !inputEditTime) {
-      alert("入力内容が正しくありません");
-      return;
-    }
-
-    await updateRecord(editRecordId, inputEditTitle, inputEditTime);
-    setIsEditOpen(false);
-    renderingRecord();
   };
 
   const onClickDeleteRecord = async (recordId: number) => {
@@ -208,13 +164,7 @@ function App() {
                         <Table.Cell textAlign={"center"}>
                           <IconButton
                             variant={"ghost"}
-                            onClick={() =>
-                              onClickEditButton(
-                                record.id,
-                                record.title,
-                                record.time
-                              )
-                            }
+                            onClick={() => setEditRecord(record)}
                           >
                             <Pencil color="green" />
                           </IconButton>
@@ -230,55 +180,14 @@ function App() {
                       </Table.Row>
                     );
                   })}
-                  <Dialog.Root
-                    open={isEditOpen}
-                    onOpenChange={(e) => setIsEditOpen(e.open)}
-                  >
-                    <Portal>
-                      <Dialog.Backdrop />
-                      <Dialog.Positioner>
-                        <Dialog.Content>
-                          <Dialog.Header>
-                            <Dialog.Title>編集</Dialog.Title>
-                          </Dialog.Header>
-                          <Dialog.Body>
-                            <Stack gap="4" align="flex-start" maxW="sm">
-                              <Field.Root>
-                                <Field.Label>学習内容</Field.Label>
-                                <Input
-                                  placeholder="reactの学習"
-                                  variant="outline"
-                                  size="sm"
-                                  value={inputEditTitle}
-                                  onChange={onChangeEditTitle}
-                                />
-                              </Field.Root>
-                              <Field.Root>
-                                <Field.Label>学習時間</Field.Label>
-                                <Input
-                                  placeholder="0"
-                                  variant="outline"
-                                  size="sm"
-                                  type="number"
-                                  min="0"
-                                  value={inputEditTime}
-                                  onChange={onChangeEditTime}
-                                />
-                              </Field.Root>
-                            </Stack>
-                          </Dialog.Body>
-                          <Dialog.Footer justifyContent={"left"}>
-                            <PrimaryButton onClick={onClickEditRecord}>
-                              編集
-                            </PrimaryButton>
-                          </Dialog.Footer>
-                          <Dialog.CloseTrigger asChild>
-                            <CloseButton size="sm" />
-                          </Dialog.CloseTrigger>
-                        </Dialog.Content>
-                      </Dialog.Positioner>
-                    </Portal>
-                  </Dialog.Root>
+                  {editRecord && (
+                    <RecordEditDialog
+                      editRecord={editRecord}
+                      isOpen={!!editRecord}
+                      onClose={() => setEditRecord(null)}
+                      onUpdated={renderingRecord}
+                    />
+                  )}
                 </Table.Body>
               </Table.Root>
             </>
