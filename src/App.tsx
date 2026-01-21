@@ -3,17 +3,17 @@ import {
   Center,
   Container,
   Heading,
-  IconButton,
   Spinner,
   Stack,
   Table,
 } from "@chakra-ui/react";
-import { Pencil, Trash } from "lucide-react";
 import { deleteRecord, GetAllRecords } from "./lib/record";
 import { useEffect, useState } from "react";
 import type { Record } from "./domain/record";
 import { RecordEditDialog } from "./components/organisms/RecordEditDialog";
 import { RecordCreateDialog } from "./components/organisms/RecordCreateDialog";
+import { EditButton } from "./components/atoms/EditButton";
+import { DeleteButton } from "./components/atoms/DeleteButton";
 
 function App() {
   console.log("Appレンダリング");
@@ -72,20 +72,12 @@ function App() {
                         <Table.Cell>{record.title}</Table.Cell>
                         <Table.Cell>{record.time}</Table.Cell>
                         <Table.Cell textAlign={"center"}>
-                          <IconButton
-                            variant={"ghost"}
-                            onClick={() => setEditRecord(record)}
-                          >
-                            <Pencil color="green" />
-                          </IconButton>
+                          <EditButton onClick={() => setEditRecord(record)} />
                         </Table.Cell>
                         <Table.Cell textAlign={"center"}>
-                          <IconButton
-                            variant={"ghost"}
+                          <DeleteButton
                             onClick={() => onClickDeleteRecord(record.id)}
-                          >
-                            <Trash color="red" />
-                          </IconButton>
+                          />
                         </Table.Cell>
                       </Table.Row>
                     );
