@@ -1,8 +1,10 @@
-import React, { useState } from "react";
 import { RecordFormFields } from "../molecules/RecordFormFields";
 import { CloseButton, Dialog, Portal } from "@chakra-ui/react";
 import { PrimaryButton } from "../atoms/PrimaryButton";
 import { insertRecord } from "@/lib/record";
+import { useForm } from "react-hook-form";
+import type { FormValues } from "@/domain/recordForm";
+import { useState } from "react";
 
 type props = {
   onUpdated: () => void;
@@ -11,43 +13,36 @@ type props = {
 export const RecordCreateDialog = (props: props) => {
   const { onUpdated } = props;
 
-  const [inputTitle, setInputTitle] = useState<string>("");
-  const [inputTime, setInputTime] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputTitle(e.target.value);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      title: "",
+      time: 0,
+    },
+  });
 
-  const onChangeTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const num = Number(value);
-
-    if (num < 0) {
-      setInputTime(0);
-    } else {
-      setInputTime(num);
-    }
-  };
-
-  const onClickRegistration = async () => {
-    if (!inputTitle || !inputTime) {
-      // setIsAlert(true);
-      alert("入力内容が正しくありません");
-      return;
-    }
-
-    await insertRecord(inputTitle, inputTime);
+  const onSubmit = async (data: FormValues) => {
+    await insertRecord(data.title, data.time);
+    reset();
     onUpdated();
-    setInputTitle("");
-    setInputTime(0);
-    // setIsAlert(false);
   };
+
+  // ダイアログと閉じると入力リセット いらないのでコメントアウト
+  // useEffect(() => {
+  //   if (!isOpen) reset();
+  // }, [isOpen]);
 
   return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>
-        <PrimaryButton w={140}>新規登録</PrimaryButton>
-      </Dialog.Trigger>
+    <Dialog.Root open={isOpen} onOpenChange={(e) => setIsOpen(e.open)}>
+      <PrimaryButton w={140} onClick={() => setIsOpen(true)}>
+        新規登録
+      </PrimaryButton>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
@@ -56,15 +51,14 @@ export const RecordCreateDialog = (props: props) => {
               <Dialog.Title>新規登録</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              <RecordFormFields
-                inputTitle={inputTitle}
-                inputTime={inputTime}
-                onChangeTitle={onChangeTitle}
-                onChangeTime={onChangeTime}
-              />
+              <form>
+                <RecordFormFields register={register} errors={errors} />
+              </form>
             </Dialog.Body>
             <Dialog.Footer justifyContent={"left"}>
-              <PrimaryButton onClick={onClickRegistration}>登録</PrimaryButton>
+              <PrimaryButton onClick={handleSubmit(onSubmit)}>
+                登録
+              </PrimaryButton>
             </Dialog.Footer>
             <Dialog.CloseTrigger asChild>
               <CloseButton size="sm" />
