@@ -45,7 +45,7 @@ export const RecordEditDialog = (props: props) => {
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>編集</Dialog.Title>
+              <Dialog.Title>記録編集</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <form>
