@@ -33,7 +33,7 @@ vi.mock("@/utils/supabase", () => {
         }),
         delete: vi.fn().mockImplementation(() => {
           return {
-            eq: vi.fn(async (field, value) => {
+            eq: vi.fn(async (_field, value) => {
               const mocDBIndex = value - 1;
               mockDB.splice(mocDBIndex, 1); // 削除
               return { status: 204 };
