@@ -30,8 +30,9 @@ function App() {
   };
 
   const onClickDeleteRecord = async (recordId: number) => {
-    await deleteRecord(recordId);
-    getAllRecords();
+    const isOK = await deleteRecord(recordId);
+
+    if (isOK) getAllRecords();
   };
 
   useEffect(() => {
@@ -49,7 +50,7 @@ function App() {
           </Center>
           {isMainLoading ? (
             <Center>
-              <Spinner size="lg" />
+              <Spinner size="lg" data-testid="loading-spinner" />
             </Center>
           ) : (
             <>

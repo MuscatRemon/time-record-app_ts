@@ -39,8 +39,7 @@ export const updateRecord = async (
 ) => {
   const { status } = await supabase
     .from(tableName)
-    .upsert({ id: recordId, title: inputTitle, time: inputTime })
-    .select();
+    .upsert({ id: recordId, title: inputTitle, time: inputTime });
 
   if (status === 201) {
     console.log("編集しました");
@@ -48,9 +47,10 @@ export const updateRecord = async (
 };
 
 export const deleteRecord = async (recordId: number) => {
-  if (!confirm("本当に削除しますか？")) {
+  const isOK = confirm("本当に削除しますか？");
+  if (!isOK) {
     console.log("キャンセルしました");
-    return;
+    return isOK;
   }
 
   const response = await supabase.from(tableName).delete().eq("id", recordId);
@@ -58,4 +58,5 @@ export const deleteRecord = async (recordId: number) => {
   if (response.status === 204) {
     console.log("削除しました");
   }
+  return isOK;
 };

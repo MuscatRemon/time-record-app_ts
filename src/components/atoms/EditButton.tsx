@@ -9,7 +9,7 @@ export const EditButton = (props: props) => {
   const { onClick } = props;
 
   return (
-    <IconButton variant={"ghost"} onClick={onClick}>
+    <IconButton variant={"ghost"} aria-label="Edit" onClick={onClick}>
       <Pencil color="green" />
     </IconButton>
   );
